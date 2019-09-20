@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>通过递归获得dom节点内的文本值</title>
+	<style type="text/css">
+		.line{height:1px;background:red;margin:10rem 0} 
+		i{color:#aaa;}
+		.linet{position:relative;color:#f20;text-indent:10rem}
+		.linet::after{
+			content:'';
+			position:absolute;
+			left:100px;
+			top:10.5px;
+			height:1px;
+			width:20rem;
+			background:green;
+		}
+</style>
+</head>
+<body>
+	<div id="demo">
+		<h3>勇气</h3>
+		<i>梁静茹</i>
+		<del>爱真的需要勇气，来面对流言蜚语，只要你一个眼神肯定，我的爱就有意义</del>
+		<p class="linet">我们都需要勇气去相信会在一起</p>
+		<div class="line"></div>
+	</div>
+	<script>
+		function allText(el){
+			var child,type,str='';
+			for(child=el.firstChild;child!=null;child=child.nextSibling){
+				var type=child.nodeType;
+			if(type===3 || type===4) str+=child.nodeValue;
+				else if(type===1) str+=arguments.callee(child);
+			}
+			return str;
+		}
+
+		var demo=document.querySelector('#demo');
+		document.write(allText(demo))
+
+
+	</script>
+</body>
+</html>

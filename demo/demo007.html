@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>数组去掉重复元素</title>
+</head>
+<body>
+	<script type="text/javascript">
+
+		function sameel(array){
+			var arr=[];
+			for(var i=0;i<array.length;i++){
+				for(var j=i+1;j<array.length;j++){
+					if(array[j]===array[i]) j= ++i;
+				}
+				arr.push(array[i]);
+			}
+			return arr;
+		}
+
+		var array=['a','ab','a',1,6,2,6,1,'1'];
+		console.log(array)
+		console.log(sameel(array))
+
+	</script>
+</body>
+</html>

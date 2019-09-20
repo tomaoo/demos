@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>字符串两端去空格</title>
+</head>
+<body>
+	<script type="text/javascript">
+
+		function trim(str){
+			var pattern=new RegExp('(^|\\s+)|(\\s+|$)','mg');
+			return str.replace(pattern,'');
+		}
+
+		console.log(trim('|   ada  |'))
+		console.log(('|   ada  |'))
+		console.log(trim('|   ada  |').length)
+		console.log(('|   ada  |').length)
+
+	</script>
+</body>
+</html>
