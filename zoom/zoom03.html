@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>放大镜简单的进行封装</title>
+	<style type="text/css">
+		body,ul{
+			margin:0;
+			padding:0;
+		}
+		ul{list-style:none;}
+		.min{
+			width:400px;
+			height:400px;
+			position:relative;
+			margin:10px 0px;
+			border:1px solid #f00;
+			user-select:none;
+			float:left;
+		}
+		.min:nth-of-type(2){
+			margin-left:565px;
+			width:320px;
+			height:240px;
+		}
+		.min .mover{
+			width:100px;
+			height:100px;
+			background:rgba(10,89,244,.6);
+			position:absolute;
+			left:0;
+			top:0;
+		}
+		.min .minimg{
+			width:100%;
+		}
+		.min .max{
+			width:550px;
+			height:550px;
+			position:absolute;
+			left:402px;
+			top:-1px;
+			border:1px solid #f00;
+			overflow:hidden;
+			display:none;
+		}
+		.min:nth-of-type(2) .max{
+			width:512px;
+			height:384px;
+			left:325px;
+		}
+		.min .max .maximg{
+			display:block;
+			position:absolute;
+			left:0;
+			top:0;
+		}
+		.order{
+			width:400px;
+			height:40px;
+			position:absolute;
+			bottom:-45px;
+			left:-1px;
+		}
+		.min:nth-of-type(2) .order{
+			width:320px;
+			bottom:-45px;
+		}
+		.order li{
+			width:74px;
+			height:74px;
+			position:relative;
+			overflow:hidden;
+			float:left;
+			margin-right:5px;
+			border:1px solid #eee;
+			cursor:pointer;
+		}
+		.min:nth-of-type(2) .order li{
+			width:58px;
+			height:44px;
+		}
+		.order li.active{
+			border:1px solid #f00;
+		}
+		.order li:last-of-type{
+			margin-right:-2px;
+		}
+		.order li>img{
+			width:100%;
+		}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<div class="min">
+			<div class="mover"></div>
+			<img class="minimg" src="img/1.jpg" >
+			<div class="max"><img src="img/1.jpg" class="maximg"></div>
+			<ul class="order">
+				<li class="active"><img class="minimg" src="img/1.jpg" ></li>
+				<li><img class="minimg" src="img/2.jpg" ></li>
+				<li><img class="minimg" src="img/3.jpg" ></li>
+				<li><img class="minimg" src="img/4.jpg" ></li>
+				<li><img class="minimg" src="img/5.jpg" ></li>
+			</ul>
+		</div>
+		<div class="min">
+			<div class="mover"></div>
+			<img class="minimg" src="img/6.jpg" >
+			<div class="max"><img src="img/6.jpg" class="maximg"></div>
+			<ul class="order">
+				<li class="active"><img class="minimg" src="img/6.jpg" ></li>
+				<li><img class="minimg" src="img/7.jpg" ></li>
+				<li><img class="minimg" src="img/8.jpg" ></li>
+				<li><img class="minimg" src="img/9.jpg" ></li>
+				<li><img class="minimg" src="img/10.jpg" ></li>
+			</ul>
+		</div>
+	</div>
+	<script type="text/javascript">
+
+		/*
+			getElementsByClassName 不支持ie8及更低版本的ie,该方便不兼容低版本ie
+		*/
+		
+		function zoom(obj){
+			//声明所需变量
+			var min=obj['min']!=undefined?obj['min']:document.getElementsByClassName('min')[0];
+			var max=min.getElementsByClassName('max')[0];
+			var minimg=min.getElementsByClassName('minimg')[0];
+			var maximg=max.getElementsByClassName('maximg')[0];
+			var mover=min.getElementsByClassName('mover')[0];
+			var lis=min.getElementsByTagName('li');
+			var src=null;
+			//选项卡切换图像主图和放大后的图像
+			(function(){
+				for(var i=0;i<lis.length;i++){
+					lis[i].index=i;
+					lis[i].onclick=function(){
+						for(var j=0;j<lis.length;j++){
+							lis[j].className='';
+							minimg.src='';
+							maximg.src='';
+						}
+						lis[this.index].className='active';
+						src=lis[this.index].getElementsByTagName('img')[0].getAttribute('src');
+						minimg.setAttribute('src',src);
+						maximg.setAttribute('src',src);
+					}
+				}
+			})()
+			
+			//拖拽 鼠标按下并且移动
+			mover.onmousedown=function(event){
+				mover.style.cursor='move';
+				max.style.display='block';
+				document.onmousemove=function(event){
+					//获取方块坐标，以及方块能够移动的最大尺寸
+					var x=event.clientX-min.getBoundingClientRect().left-mover.offsetWidth/2;
+					var y=event.clientY-min.getBoundingClientRect().top-mover.offsetHeight/2;
+					var w=min.offsetWidth-mover.offsetWidth-2;
+					var h=min.offsetHeight-mover.offsetHeight-2;
+					
+					//设置方块移动的范围
+					if(x<0) x=0;
+					if(x>w) x=w;
+					if(y<0) y=0;
+					if(y>h) y=h;
+					//设置方块的位置
+					mover.style.left=x+'px';
+					mover.style.top=y+'px';
+					//计算移动的比率
+					var lx=x/w;
+					var ly=y/h;
+					//设置放大图像的位置;
+					maximg.style.left=lx*(max.offsetWidth-maximg.offsetWidth)+'px';
+					maximg.style.top=ly*(max.offsetHeight-maximg.offsetHeight)+'px';
+				}
+				//鼠标释放时,停止移动，隐藏放大图像，并设置方块样式为默认的箭头
+				document.onmouseup=function(){
+					document.onmousemove=null;
+					mover.style.cursor='';
+					max.style.display='none';
+				}
+			}
+		}
+
+		//调用第一个放大镜
+		zoom({})
+		//调用第二个放大镜
+		zoom({min:document.getElementsByClassName('min')[1]})
+
+	</script>
+</body>
+</html>
